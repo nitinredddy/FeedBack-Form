@@ -36,6 +36,31 @@ const FetchFeedbacks = () => {
             toast.error("Server error. Please try again.");
         }
     }
+    const handleDownload = async () => {
+        try {
+          const res = await fetch("http://localhost:3000/api/v1/feedbacks/csv", {
+            method: "GET",
+            headers: {
+              "x-admin-check": pass,
+            },
+          });
+      
+          if (!res.ok) {
+            toast.error("Failed to download CSV");
+            return;
+          }
+      
+          const blob = await res.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = "feedbacks.csv";
+          a.click();
+        } catch (error) {
+          toast.error("Server error while downloading CSV");
+        }
+      };
+      
   return (
     <div>
       {!isAuthorised ? (
@@ -58,6 +83,9 @@ const FetchFeedbacks = () => {
               </li>
             ))}
           </ul>
+
+          <button onClick={handleDownload}>Download Feedbacks as CSV</button>
+
         </div>
       )}
     </div>
